@@ -10,5 +10,5 @@ COPY . /app
 WORKDIR /app
 RUN uv sync --frozen --no-cache
 
-# Run the application.
-CMD ["/app/.venv/bin/uvicorn", "main:app", "--port", "8000", "--host", "0.0.0.0"]
+# Run the application (handled by compose)
+# CMD ["/app/.venv/bin/uvicorn", "app.main:app", "--proxy-headers", "--reload", "--port", "8000", "--host", "0.0.0.0"]
