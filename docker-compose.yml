@@ -4,3 +4,23 @@ services:
     command: /app/.venv/bin/uvicorn app.main:app --proxy-headers --reload --port 8000 --host 0.0.0.0
     ports:
       - 8000:8000
+  db:
+    image: postgres
+    restart: always
+    # set shared memory limit when using docker compose
+    shm_size: 128mb
+    # or set shared memory limit when deploy via swarm stack
+    #volumes:
+    #  - type: tmpfs
+    #    target: /dev/shm
+    #    tmpfs:
+    #      size: 134217728 # 128*2^20 bytes = 128Mb
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: postgres
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080

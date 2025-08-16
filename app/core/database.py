@@ -1,44 +1,58 @@
 from typing import Annotated
-
 from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlmodel import Field, Session, SQLModel, create_engine, select
+from contextlib import asynccontextmanager
+from app.db.models.firearm import Hero
+
+# class Hero(SQLModel, table=True):
+#     id: int | None = Field(default=None, primary_key=True)
+#     name: str = Field(index=True)
+#     age: int | None = Field(default=None, index=True)
+#     secret_name: str
 
 
-class Hero(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    name: str = Field(index=True)
-    age: int | None = Field(default=None, index=True)
-    secret_name: str
-
-
-sqlite_file_name = "database.db"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
+# sqlite_file_name = "database.db"
+DB_URL = "postgresql://user:postgres@localhost:5432/postgres"
 
 connect_args = {"check_same_thread": False}
-engine = create_engine(sqlite_url, connect_args=connect_args)
-
+engine = create_engine(DB_URL, connect_args=connect_args)
 
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
 
-
+# create session dependency
 def get_session():
     with Session(engine) as session:
         yield session
 
-
 SessionDep = Annotated[Session, Depends(get_session)]
 
-app = FastAPI()
+# create tables on startup
+# -- DEPRECATED -- #
+# app = FastAPI()
 
+# @app.on_event("startup")
+# def on_startup():
+#     create_db_and_tables()
 
-@app.on_event("startup")
-def on_startup():
+# -- NEWEST -- #
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # run on startup
+    print("Starting up: creating database tables...")
     create_db_and_tables()
+    yield
+    # on shutdown
+    print("Shutting down...")
 
+app = FastAPI(lifespan=lifespan)
+
+@app.get("/health/")
+async def health_check():
+    return {"status": "healthy"}
 
 @app.post("/heroes/")
-def create_hero(hero: Hero, session: SessionDep) -> Hero:
+async def create_hero(hero: Hero, session: SessionDep) -> Hero:
     session.add(hero)
     session.commit()
     session.refresh(hero)
@@ -46,7 +60,7 @@ def create_hero(hero: Hero, session: SessionDep) -> Hero:
 
 
 @app.get("/heroes/")
-def read_heroes(
+async def read_heroes(
     session: SessionDep,
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
@@ -56,7 +70,7 @@ def read_heroes(
 
 
 @app.get("/heroes/{hero_id}")
-def read_hero(hero_id: int, session: SessionDep) -> Hero:
+async def read_hero(hero_id: int, session: SessionDep) -> Hero:
     hero = session.get(Hero, hero_id)
     if not hero:
         raise HTTPException(status_code=404, detail="Hero not found")
@@ -64,7 +78,7 @@ def read_hero(hero_id: int, session: SessionDep) -> Hero:
 
 
 @app.delete("/heroes/{hero_id}")
-def delete_hero(hero_id: int, session: SessionDep):
+async def delete_hero(hero_id: int, session: SessionDep):
     hero = session.get(Hero, hero_id)
     if not hero:
         raise HTTPException(status_code=404, detail="Hero not found")
