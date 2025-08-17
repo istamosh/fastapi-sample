@@ -18,11 +18,11 @@ def read_item(item_id: int, q: Union[str, None] = None):
         "q": q
     }
 
-@app.get("/health/")
+@app.get("/health")
 async def health_check():
     return {"status": "healthy"}
 
-@app.post("/heroes/")
+@app.post("/heroes")
 async def create_hero(hero: Hero, session: SessionDep) -> Hero:
     session.add(hero)
     session.commit()
@@ -30,7 +30,7 @@ async def create_hero(hero: Hero, session: SessionDep) -> Hero:
     return hero
 
 
-@app.get("/heroes/")
+@app.get("/heroes")
 async def read_heroes(
     session: SessionDep,
     offset: int = 0,
@@ -56,6 +56,23 @@ async def delete_hero(hero_id: int, session: SessionDep):
     session.delete(hero)
     session.commit()
     return {"ok": True}
+
+from enum import Enum
+
+class ModelName(str, Enum):
+    alexnet = "alexnet"
+    resnet = "resnet"
+    lenet = "lenet"
+
+@app.get("/models/{model_name}")
+async def get_model(model_name: ModelName):
+    if model_name is ModelName.alexnet:
+        return {"model_name": model_name, "message": "Deep Learning FTW!"}
+
+    if model_name.value == "lenet":
+        return {"model_name": model_name, "message": "LeCNN all the images"}
+
+    return {"model_name": model_name, "message": "Have some residuals"}
 
 if __name__ == "__main__":
     read_root()

@@ -2,6 +2,10 @@ from typing import Annotated
 from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 from contextlib import asynccontextmanager
+
+from app.routes.user import userRouter
+from app.routes.auth import authRouter
+
 # from app.db.models.firearm import Hero
 
 # class Hero(SQLModel, table=True):
@@ -53,6 +57,8 @@ async def lifespan(app: FastAPI):
     print("Shutting down...")
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(userRouter, tags=["User"])
+app.include_router(authRouter, tags=["Auth"], prefix="/auth")
 
 # @app.get("/health/")
 # async def health_check():
