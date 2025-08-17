@@ -1,9 +1,4 @@
 services:
-  web:
-    build: .
-    command: /app/.venv/bin/uvicorn app.main:app --proxy-headers --reload --port 8000 --host 0.0.0.0
-    ports:
-      - 8000:8000
   db:
     image: postgres
     restart: always
@@ -18,9 +13,30 @@ services:
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fastapi_sample_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d fastapi_sample_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - 5432:5432
+    volumes:
+      - db_data:/var/lib/postgresql/data # persist data
+  web:
+    build: . # use Dockerfile
+    command: /app/.venv/bin/uvicorn app.main:app --proxy-headers --reload --port 8000 --host 0.0.0.0
+    ports:
+      - 8000:8000
+    depends_on:
+      db:
+        condition: service_healthy
 
   adminer:
     image: adminer
     restart: always
     ports:
       - 8080:8080
+
+volumes:
+  db_data:
