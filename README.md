@@ -25,3 +25,9 @@ Stop the container:
 
 Check the log of the container:
 `sudo docker logs container_name`
+
+Wipe the postgres database clean:
+`sudo docker stop database-service`
+`sudo docker compose down`
+`sudo docker volume list`
+`sudo docker volume rm volume-name`
