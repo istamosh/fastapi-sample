@@ -19,3 +19,10 @@ class UserUpdate(BaseModel):
     id: int
     username: Union[str, None] = None
     password: Union[str, None] = None
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+class UserWithToken(BaseModel):
+    token: str

@@ -31,3 +31,5 @@ Wipe the postgres database clean:
 `sudo docker compose down`
 `sudo docker volume list`
 `sudo docker volume rm volume-name`
+
+Flow: router -> service -> repository -> db
