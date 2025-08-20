@@ -10,3 +10,6 @@ wheels/
 .venv
 
 .vscode
+
+# local environment variable
+.env

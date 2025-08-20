@@ -7,3 +7,6 @@ wheels/
 
 .venv
 .vscode
+
+.env
+.env.example
