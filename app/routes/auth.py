@@ -1,15 +1,19 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlmodel import Session
 from app.db.schemas.user import UserLogin, UserCreate
-from app.core.database import SessionDep
+from app.core.dependencies import get_session
 from app.service.user import UserService, UserWithToken, UserRead
 
 authRouter = APIRouter()
 
 @authRouter.post("/login", 
                  status_code=200, 
-                 response_model=UserWithToken
+                 response_model=UserWithToken,
+                 responses={
+                     401: {"description": "Unauthorized. Invalid credentials."},
+                 }
                  )
-async def login(loginDetails: UserLogin, session: SessionDep):
+async def login(loginDetails: UserLogin, session: Session = Depends(get_session)):
     try:
         return UserService(session=session).login(login_details=loginDetails)
     except Exception as error:
@@ -17,10 +21,10 @@ async def login(loginDetails: UserLogin, session: SessionDep):
         raise error
 
 @authRouter.post("/signup",
-                 status_code=200,
+                 status_code=201,
                  response_model=UserRead
                  )
-async def signup(signupDeails: UserCreate, session: SessionDep):
+async def signup(signupDeails: UserCreate, session: Session = Depends(get_session)):
     try: 
         return UserService(session=session).signup(user_details=signupDeails)
     except Exception as error:

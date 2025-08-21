@@ -17,7 +17,11 @@ class UserService:
         return self.__userRepository.create_user(user_data=user_details)
     
     def login(self, login_details: UserLogin) -> UserWithToken:
-        user = self.__userRepository.get_user_by_id(user_id=login_details.username)
+        user = self.__userRepository.get_user(username=login_details.username)
+
+        # check if user is nonexistent
+        if user is None:
+            raise HTTPException(status_code=401, detail="Unauthorized. Invalid credentials.")
 
         # using user.hashed_password rather than user.password
         if hashHelper.HashHelper.verify_password(plain_password=login_details.password, hashed_password=user.hashed_password):

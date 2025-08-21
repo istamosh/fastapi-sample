@@ -3,9 +3,6 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 from contextlib import asynccontextmanager
 
-from app.routes.user import userRouter
-from app.routes.auth import authRouter
-
 # from app.db.models.firearm import Hero
 
 # class Hero(SQLModel, table=True):
@@ -28,13 +25,14 @@ DB_URL = "postgresql://user:postgres@db:5432/fastapi_sample_db"
 # engine = create_engine(DB_URL, connect_args=connect_args)
 engine = create_engine(DB_URL)
 
+# engine creation before importing deps
+from app.core.dependencies import get_session
+
+from app.routes.user import userRouter
+from app.routes.auth import authRouter
+
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
-
-# create session dependency
-def get_session():
-    with Session(engine) as session:
-        yield session
 
 SessionDep = Annotated[Session, Depends(get_session)]
 

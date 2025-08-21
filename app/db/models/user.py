@@ -2,7 +2,7 @@ from app.core.database import SQLModel
 from sqlmodel import Field
 from typing import Optional
 from enum import Enum
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 
 class Role(str, Enum):
     player = "player"
@@ -13,5 +13,5 @@ class User(SQLModel, table=True):
     username: str = Field(index=True, unique=True)
     hashed_password: str
     role: Role
-    created_at: datetime = Field(default_factory=datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))

@@ -23,6 +23,9 @@ Build and compose the container detached:
 Stop the container:
 `sudo docker compose down`
 
+Stop the container with database wipe:
+`sudo docker compose down --volumes`
+
 Check the log of the container:
 `sudo docker logs container_name`
 
