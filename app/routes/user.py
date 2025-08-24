@@ -1,4 +1,6 @@
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, FastAPI, Depends, Request
+from app.db.schemas.user import UserRead
+from app.utils.protectRoute import get_current_user
 
 # app = FastAPI()
 userRouter = APIRouter()
@@ -10,3 +12,8 @@ async def read_users():
 
 
 # app.include_router(router)
+
+# test protected route
+@userRouter.get("/me")
+async def read_profile(user: UserRead = Depends(get_current_user)):
+    return {"data" : user}

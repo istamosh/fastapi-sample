@@ -5,7 +5,7 @@ from datetime import datetime
 
 class UserCreate(BaseModel):
     username: str
-    password: str # will be hashed in service layer
+    password: str
     role: Role
 
 class UserRead(BaseModel):
