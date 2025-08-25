@@ -16,9 +16,9 @@ class UserRead(BaseModel):
     updated_at: datetime
 
 class UserUpdate(BaseModel):
-    id: int
     username: Union[str, None] = None
     password: Union[str, None] = None
+    confirm_password: Union[str, None] = None
 
 class UserLogin(BaseModel):
     username: str

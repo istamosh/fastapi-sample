@@ -7,8 +7,6 @@ from app.service.user import UserRead, UserService, UserRepository
 from fastapi.security import HTTPAuthorizationCredentials
 from app.core.security.httpBearer import security
 
-BEARER = 'Bearer '
-
 def get_current_user(
         session: Session = Depends(get_session),
         credentials: HTTPAuthorizationCredentials = Security(security)
