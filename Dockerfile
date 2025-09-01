@@ -1,14 +1,14 @@
 FROM python:3.12-slim
 
-# Install uv.
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+# Set working directory
+WORKDIR /app
 
-# Copy the application into the container.
+# Copy requirements and install dependencies
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the application into the container
 COPY . /app
 
-# Install the application dependencies.
-WORKDIR /app
-RUN uv sync --frozen --no-cache
-
-# Run the application (handled by compose)
-# CMD ["/app/.venv/bin/uvicorn", "app.main:app", "--proxy-headers", "--reload", "--port", "8000", "--host", "0.0.0.0"]
+# Default command (can be overridden by compose)
+CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]

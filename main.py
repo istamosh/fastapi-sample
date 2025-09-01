@@ -12,6 +12,10 @@ class Item(BaseModel):
 def read_root():
     return {"Hello": "World"}
 
+@app.get("/health")
+def backend_health():
+    return {"status": "healthy"}
+
 @app.get("/items/{item_id}")
 def read_item(
     item_id: int,
