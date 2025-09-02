@@ -1,7 +1,19 @@
 from typing import Union
 from fastapi import FastAPI
 from pydantic import BaseModel
-app = FastAPI()
+from contextlib import asynccontextmanager
+
+from orm import main
+
+# on_event is deprecated, use this instead
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    main() # trigger the main function inside orm.py
+    yield
+    # cleanup
+
+# pass lifespan to FastAPI
+app = FastAPI(lifespan=lifespan)
 
 class Item(BaseModel):
     name: str
