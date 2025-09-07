@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
 
-from orm import main
+from orm import main, FirearmCreate, register_firearm
 
 # on_event is deprecated, use this instead
 @asynccontextmanager
@@ -43,3 +43,7 @@ def update_item(item_id: int, item: Item):
         "item_name": item.name,
         "item_id": item_id
     }
+
+@app.post("/firearm/")
+def create_firearm(firearm: FirearmCreate):
+    return register_firearm(firearm)
